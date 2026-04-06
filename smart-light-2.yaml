@@ -1,0 +1,23 @@
+packages:
+  base: !include common/00-base.yaml
+  lt-version: !include common/02-lt-version.yaml
+  wifi-fast: !include common/03-wifi-fast.yaml
+  light-rgbcw: !include common/20-light-rgbcw.yaml
+substitutions:
+  device_name: smart-light-2
+  friendly_name: Smart Light 2
+  api_key: !secret smart_light_2_api
+  ota_password: !secret smart_light_2_ota
+  static_ip: 192.168.0.222
+  r_pin: P26
+  g_pin: P6
+  b_pin: P24
+  c_pin: P8
+  w_pin: P7
+
+# ---
+
+bk72xx:
+  board: wb2l
+
+# ---

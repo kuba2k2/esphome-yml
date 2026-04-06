@@ -1,0 +1,223 @@
+packages:
+  base: !include common/00-base.yaml
+  wifi-fast: !include common/03-wifi-fast.yaml
+substitutions:
+  device_name: wake-kuba-pc
+  friendly_name: Wake KUBA-PC
+  api_key: !secret wake_kuba_pc_api
+  ota_password: !secret wake_kuba_pc_ota
+  static_ip: 192.168.0.210
+
+# ---
+
+esp8266:
+  board: esp01_1m
+  restore_from_flash: true
+
+# ---
+
+i2c:
+  sda: GPIO2
+  scl: GPIO0
+  scan: true
+
+pcf8574:
+  - id: expander
+    address: 0x20
+
+output:
+  - platform: gpio
+    id: output_power
+    pin:
+      pcf8574: expander
+      number: 3
+      mode: OUTPUT
+      inverted: true
+
+  - platform: gpio
+    id: output_reset
+    pin:
+      pcf8574: expander
+      number: 2
+      mode: OUTPUT
+      inverted: true
+
+binary_sensor:
+  - platform: gpio
+    id: input_led
+    pin:
+      pcf8574: expander
+      number: 4
+      mode: INPUT
+    on_press:
+      then:
+        - light.turn_on: light_rgb
+    on_release:
+      then:
+        - light.turn_off: light_rgb
+
+switch:
+  - platform: template
+    name: Power
+    icon: mdi:power
+    lambda: |-
+      if (id(input_led).state) {
+        return true;
+      } else {
+        return false;
+      }
+    restore_mode: DISABLED
+    turn_on_action:
+      - button.press: button_power
+    turn_off_action:
+      - button.press: button_power
+
+button:
+  - platform: output
+    id: button_power
+    output: output_power
+    duration: 200ms
+
+  - platform: output
+    name: Reset
+    icon: mdi:restart-alert
+    output: output_reset
+    duration: 200ms
+
+  - platform: output
+    name: Force Power Off
+    icon: mdi:shield-alert-outline
+    output: output_power
+    duration: 5000ms
+
+# ---
+
+esphome:
+  on_boot:
+    then:
+      - light.control:
+          id: light_rgb
+          state: !lambda |-
+            return id(input_led).state;
+
+globals:
+  - id: last_effect
+    type: std::string
+    restore_value: yes
+    initial_value: '"Rainbow"'
+
+light:
+  - platform: neopixelbus
+    id: light_rgb
+    name: RGB Light
+    type: GRB
+    variant: WS2811
+    pin: GPIO3
+    num_leds: 9
+    method:
+      type: esp8266_dma
+
+    on_turn_on:
+      - lambda: |-
+          ESP_LOGI("yaml", "Restoring effect: %s", id(last_effect).c_str());
+      - light.control:
+          id: light_rgb
+          effect: !lambda |-
+            return id(last_effect);
+
+    on_state:
+      - lambda: |-
+          auto effect = id(light_rgb).get_effect_name();
+          if (effect != "None" && effect != id(last_effect)) {
+            ESP_LOGI("yaml", "Effect set: %s", id(light_rgb).get_effect_name().c_str());
+            id(last_effect) = effect;
+          }
+
+    effects:
+      - addressable_rainbow:
+      - addressable_color_wipe:
+      - addressable_color_wipe:
+          name: Color Wipe Effect With Custom Values
+          add_led_interval: 20ms
+      - addressable_scan:
+      - addressable_scan:
+          name: Scan Effect With Custom Values
+          move_interval: 20ms
+          scan_width: 2
+      - addressable_twinkle:
+      - addressable_random_twinkle:
+      - addressable_random_twinkle:
+          name: Random Twinkle Effect With Custom Values
+          twinkle_probability: 80%
+          progress_interval: 16ms
+      - addressable_fireworks:
+      - addressable_fireworks:
+          name: Big Fireworks
+          spark_probability: 80%
+          use_random_color: true
+          fade_out_rate: 80
+          update_interval: 16ms
+      - addressable_lambda:
+          name: Gold Glitter
+          update_interval: 18ms
+          lambda:
+            static int state = 0;
+
+            if (initial_run){
+              state = 0;
+
+              it.all() = Color(218,165,32);
+
+              ESP_LOGD("custom", "Gold Glitter");
+            } else {
+
+              it.all() = Color(218,165,32);
+
+              if(state==0){
+                int i = rand() % it.size();
+                it[i] = Color::WHITE;
+                state += 1;
+              } else {
+                state += 1;
+                state = state % 10;
+              }
+            }
+      - strobe:
+          name: Strobe
+          colors:
+            - red: 100%
+              green: 0%
+              blue: 0%
+              duration: 20ms
+            - state: false
+              duration: 20ms
+            - red: 100%
+              green: 100%
+              blue: 0%
+              duration: 20ms
+            - state: false
+              duration: 20ms
+            - red: 0%
+              green: 100%
+              blue: 0%
+              duration: 20ms
+            - state: false
+              duration: 20ms
+            - red: 0%
+              green: 100%
+              blue: 100%
+              duration: 20ms
+            - state: false
+              duration: 20ms
+            - red: 0%
+              green: 0%
+              blue: 100%
+              duration: 20ms
+            - state: false
+              duration: 20ms
+            - red: 100%
+              green: 0%
+              blue: 100%
+              duration: 20ms
+            - state: false
+              duration: 20ms

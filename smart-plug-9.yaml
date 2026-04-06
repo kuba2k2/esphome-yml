@@ -1,0 +1,39 @@
+packages:
+  base: !include common/00-base.yaml
+  wifi-fast: !include common/03-wifi-fast.yaml
+  status-led: !include common/10-status-led.yaml
+  plug-switch-led: !include common/31-plug-switch-led.yaml
+  energy-bl0937: !include common/40-energy-bl0937.yaml
+substitutions:
+  device_name: smart-plug-9
+  friendly_name: Smart Plug 9
+  api_key: !secret smart_plug_9_api
+  ota_password: !secret smart_plug_9_ota
+  static_ip: 192.168.0.239
+  status_pin: GPIO6
+  button_pin: GPIO10
+  led_pin: GPIO1
+  relay_pin: GPIO4
+  cf_pin: GPIO7
+  cf1_pin: GPIO3
+  sel_pin: GPIO5
+  voltage_divider: "1463"
+  current_resistor: "0.001010 ohm"
+
+# ---
+
+esp32:
+  board: esp32-c2-devkitm-1
+  flash_size: 2MB
+  partitions: smart-plug-9.csv
+  framework:
+    type: esp-idf
+    sdkconfig_options:
+      CONFIG_XTAL_FREQ_26: y
+
+time:
+  - id: !remove time_sntp
+  - platform: homeassistant
+    id: time_homeassistant
+
+# ---

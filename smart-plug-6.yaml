@@ -1,0 +1,34 @@
+packages:
+  base: !include common/00-base.yaml
+  lt-version: !include common/02-lt-version.yaml
+  # wifi-fast: !include common/03-wifi-fast.yaml
+  status-led: !include common/10-status-led.yaml
+  plug-switch: !include common/30-plug-switch.yaml
+  energy-bl0937: !include common/40-energy-bl0937.yaml
+  wireguard: !include common/50-wireguard.yaml
+substitutions:
+  device_name: smart-plug-6
+  friendly_name: Smart Plug 6
+  api_key: !secret smart_plug_6_api
+  ota_password: !secret smart_plug_6_ota
+  # static_ip: 192.168.0.236
+  status_pin: P8
+  button_pin: P10
+  relay_pin: P26
+  cf_pin: P7
+  cf1_pin: P6
+  sel_pin: P24
+  voltage_divider: "766"
+  current_resistor: "0.001066 ohm"
+  wg_address: 10.1.0.236
+  wg_private_key: !secret wg_smart_plug_6_private_key
+  wg_preshared_key: !secret wg_smart_plug_6_preshared_key
+
+# ---
+
+bk72xx:
+  board: cb2s
+  framework:
+    uart_port: 1
+
+# ---

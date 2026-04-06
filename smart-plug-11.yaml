@@ -1,0 +1,29 @@
+packages:
+  base: !include common/00-base.yaml
+  lt-version: !include common/02-lt-version.yaml
+  wifi-fast: !include common/03-wifi-fast.yaml
+  plug-switch-led: !include common/31-plug-switch-led.yaml
+  energy-bl0937: !include common/40-energy-bl0937.yaml
+substitutions:
+  device_name: smart-plug-11
+  friendly_name: Smart Plug 11
+  api_key: !secret smart_plug_11_api
+  ota_password: !secret smart_plug_11_ota
+  static_ip: 192.168.0.241
+  button_pin: P10
+  relay_pin: P26
+  led_pin: P8
+  cf_pin: P7
+  cf1_pin: P6
+  sel_pin: P24
+  voltage_divider: "791"
+  current_resistor: "0.001029 ohm"
+
+# ---
+
+bk72xx:
+  board: cb2s
+  framework:
+    uart_port: 1
+
+# ---

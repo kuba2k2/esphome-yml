@@ -1,0 +1,18 @@
+packages:
+  base: !include common/00-base.yaml
+  lt-version: !include common/02-lt-version.yaml
+  wifi-fast: !include common/03-wifi-fast.yaml
+substitutions:
+  device_name: dev-rtl8720cm
+  friendly_name: Dev RTL8720CM
+  api_key: !secret dev_api
+  static_ip: 192.168.0.99
+
+# ---
+
+rtl87xx:
+  board: generic-rtl8720cm-4mb-1712k
+  framework:
+    version: latest
+
+# ---

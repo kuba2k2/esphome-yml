@@ -1,0 +1,118 @@
+packages:
+  base: !include common/00-base.yaml
+  lt-version: !include common/02-lt-version.yaml
+  wifi-fast: !include common/03-wifi-fast.yaml
+  status-led: !include common/10-status-led.yaml
+substitutions:
+  device_name: bathroom-light
+  friendly_name: Bathroom Light
+  api_key: !secret bathroom_light_api
+  ota_password: !secret bathroom_light_ota
+  static_ip: 192.168.0.212
+  status_pin: P22
+
+# ---
+
+bk72xx:
+  board: generic-bk7231n-qfn32-tuya
+  framework:
+    version: latest
+
+# ---
+
+binary_sensor:
+  - platform: gpio
+    id: binary_switch_1
+    pin:
+      number: P20
+      inverted: true
+      mode: INPUT_PULLUP
+    on_multi_click:
+      - timing:
+          - ON for at most 500ms
+        then:
+          - light.toggle: light_1
+
+  - platform: gpio
+    id: binary_switch_2
+    pin:
+      number: P7
+      inverted: true
+      mode: INPUT_PULLUP
+    on_multi_click:
+      - timing:
+          - ON for at most 800ms
+        then:
+          - light.toggle: light_2
+      - timing:
+          - ON for at least 1.5s
+        then:
+          - fan.toggle: fan_1
+
+output:
+  - platform: gpio
+    id: output_backlight
+    pin: P23
+    inverted: true
+
+  - platform: gpio
+    id: output_relay_1
+    pin: P6
+  - platform: gpio
+    id: output_relay_2
+    pin: P8
+  - platform: gpio
+    id: output_relay_3
+    pin: P9
+
+  - platform: gpio
+    id: output_led_1
+    pin:
+      number: P26
+      inverted: true
+  - platform: gpio
+    id: output_led_2
+    pin:
+      number: P11
+      inverted: true
+
+light:
+  - platform: binary
+    id: light_backlight
+    name: Backlight
+    output: output_backlight
+    restore_mode: ALWAYS_ON
+    entity_category: config
+
+  - platform: binary
+    id: light_switch_1
+    output: output_led_1
+  - platform: binary
+    id: light_switch_2
+    output: output_led_2
+
+  - platform: binary
+    id: light_1
+    name: Light 1
+    output: output_relay_1
+    restore_mode: ALWAYS_OFF
+    on_turn_on:
+      - light.turn_on: light_switch_1
+    on_turn_off:
+      - light.turn_off: light_switch_1
+
+  - platform: binary
+    id: light_2
+    name: Light 2
+    output: output_relay_2
+    restore_mode: ALWAYS_OFF
+    on_turn_on:
+      - light.turn_on: light_switch_2
+    on_turn_off:
+      - light.turn_off: light_switch_2
+
+fan:
+  - platform: binary
+    id: fan_1
+    name: Fan
+    output: output_relay_3

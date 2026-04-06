@@ -1,0 +1,23 @@
+packages:
+  base: !include common/00-base.yaml
+  lt-version: !include common/02-lt-version.yaml
+  wifi-fast: !include common/03-wifi-fast.yaml
+  light-rgbcw: !include common/20-light-rgbcw.yaml
+substitutions:
+  device_name: smart-light-4
+  friendly_name: Smart Light 4
+  api_key: !secret smart_light_4_api
+  ota_password: !secret smart_light_4_ota
+  static_ip: 192.168.0.224
+  r_pin: P8
+  g_pin: P7
+  b_pin: P6
+  c_pin: P26
+  w_pin: P24
+
+# ---
+
+bk72xx:
+  board: generic-bk7231n-qfn32-tuya
+
+# ---

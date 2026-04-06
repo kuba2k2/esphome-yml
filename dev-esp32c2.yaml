@@ -1,0 +1,25 @@
+packages:
+  base: !include common/00-base.yaml
+  wifi-fast: !include common/03-wifi-fast.yaml
+substitutions:
+  device_name: dev-esp32c2
+  friendly_name: Dev ESP32-C2
+  api_key: !secret dev_api
+  static_ip: 192.168.0.99
+
+# ---
+
+esp32:
+  board: esp32-c2-devkitm-1
+  flash_size: 4MB
+  framework:
+    type: esp-idf
+    sdkconfig_options:
+      CONFIG_XTAL_FREQ_26: y
+
+time:
+  - id: !remove time_sntp
+  - platform: homeassistant
+    id: time_homeassistant
+
+# ---

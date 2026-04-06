@@ -1,0 +1,33 @@
+packages:
+  base: !include common/00-base.yaml
+  lt-version: !include common/02-lt-version.yaml
+  wifi-fast: !include common/03-wifi-fast.yaml
+  status-led: !include common/10-status-led.yaml
+  plug-switch: !include common/30-plug-switch.yaml
+  energy-bl0937: !include common/40-energy-bl0937.yaml
+substitutions:
+  device_name: smart-plug-4
+  friendly_name: Smart Plug 4
+  api_key: !secret smart_plug_4_api
+  ota_password: !secret smart_plug_4_ota
+  static_ip: 192.168.0.234
+  status_pin: PA23
+  button_pin: PA18
+  relay_pin: PA0
+  cf_pin: PA5
+  cf1_pin: PA12
+  sel_pin: PA15
+  cf_cf1_inverted: false
+  voltage_divider: "1598"
+  current_resistor: "0.001091 ohm"
+
+# ---
+
+rtl87xx:
+  board: wr2
+
+esphome:
+  platformio_options:
+    custom_versions.freertos: 8.2.3
+
+# ---

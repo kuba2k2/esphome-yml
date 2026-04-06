@@ -1,0 +1,50 @@
+packages:
+  base: !include common/00-base.yaml
+  lt-version: !include common/02-lt-version.yaml
+  status-led: !include common/10-status-led.yaml
+substitutions:
+  device_name: smart-switch-2
+  friendly_name: Smart Switch 2
+  api_key: !secret smart_switch_2_api
+  ota_password: !secret smart_switch_2_ota
+  status_pin: P26
+  status_inverted: false
+
+# ---
+
+bk72xx:
+  board: cb2s
+  framework:
+    uart_port: 1
+
+# ---
+
+binary_sensor:
+  - platform: gpio
+    id: binary_onoff_1
+    pin:
+      number: P10
+      inverted: true
+      mode: INPUT_PULLUP
+    on_state:
+      then:
+        - switch.toggle: switch_1
+  - platform: gpio
+    id: binary_switch_all
+    pin:
+      number: P7
+      inverted: true
+      mode: INPUT_PULLUP
+    on_press:
+      then:
+        - switch.toggle: switch_1
+
+switch:
+  - platform: gpio
+    id: switch_1
+    name: Relay 1
+    pin: P6
+    on_turn_on:
+      - light.turn_on: light_status
+    on_turn_off:
+      - light.turn_off: light_status

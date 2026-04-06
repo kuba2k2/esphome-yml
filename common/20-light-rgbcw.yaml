@@ -1,0 +1,123 @@
+substitutions:
+  r_pin: REPLACEME
+  g_pin: REPLACEME
+  b_pin: REPLACEME
+  c_pin: REPLACEME
+  w_pin: REPLACEME
+  r_max: 1.00
+  g_max: 0.70
+  b_max: 0.75
+  restore_mode: RESTORE_AND_ON
+
+# ---
+
+globals:
+  - id: last_effect
+    type: std::string
+    restore_value: yes
+    initial_value: '"None"'
+
+output:
+  - platform: libretiny_pwm
+    id: output_red
+    pin: ${r_pin}
+    max_power: 1.00
+  - platform: libretiny_pwm
+    id: output_green
+    pin: ${g_pin}
+    max_power: 0.70
+  - platform: libretiny_pwm
+    id: output_blue
+    pin: ${b_pin}
+    max_power: 0.75
+  - platform: libretiny_pwm
+    id: output_cold
+    pin: ${c_pin}
+  - platform: libretiny_pwm
+    id: output_warm
+    pin: ${w_pin}
+
+light:
+  - platform: rgbww
+    id: light_rgbww
+    name: Light
+    constant_brightness: true
+    color_interlock: true
+    cold_white_color_temperature: 6500 K
+    warm_white_color_temperature: 2700 K
+    red: output_red
+    green: output_green
+    blue: output_blue
+    cold_white: output_cold
+    warm_white: output_warm
+    restore_mode: ${restore_mode}
+
+    on_turn_on:
+      - lambda: |-
+          ESP_LOGI("yaml", "Restoring effect: %s", id(last_effect).c_str());
+      - light.control:
+          id: light_rgbww
+          effect: !lambda |-
+            return id(last_effect);
+
+    on_state:
+      - lambda: |-
+          auto effect = id(light_rgbww).get_effect_name();
+          if (effect != id(last_effect)) {
+            ESP_LOGI("yaml", "Effect set: %s", id(light_rgbww).get_effect_name().c_str());
+            id(last_effect) = effect;
+          }
+
+    effects:
+      - random:
+          name: "Random"
+          transition_length: 5s
+          update_interval: 7s
+      - random:
+          name: "Random (Fast)"
+          transition_length: 400ms
+          update_interval: 500ms
+      - random:
+          name: "Random (Strobe)"
+          transition_length: 0s
+          update_interval: 70ms
+      - flicker:
+          name: "Flicker"
+      - strobe:
+          name: "Colorful Strobe"
+          colors:
+            - color_mode: RGB
+              red: 100%
+              green: 0%
+              blue: 0%
+              duration: 70ms
+            - color_mode: RGB
+              red: 100%
+              green: 100%
+              blue: 0%
+              duration: 70ms
+            - color_mode: RGB
+              red: 0%
+              green: 100%
+              blue: 0%
+              duration: 70ms
+            - color_mode: RGB
+              red: 0%
+              green: 100%
+              blue: 100%
+              duration: 70ms
+            - color_mode: RGB
+              red: 0%
+              green: 0%
+              blue: 100%
+              duration: 70ms
+            - color_mode: RGB
+              red: 100%
+              green: 0%
+              blue: 100%
+              duration: 70ms
+            - color_mode: RGB
+              red: 100%
+              green: 100%
+              blue: 100%
+              duration: 70ms

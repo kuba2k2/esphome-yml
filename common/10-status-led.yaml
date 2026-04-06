@@ -1,0 +1,16 @@
+substitutions:
+  status_pin: REPLACEME
+  status_inverted: true
+
+# ---
+
+light:
+  - platform: status_led
+    id: light_status
+    name: Status LED
+    pin:
+      number: ${status_pin}
+      inverted: ${status_inverted}
+    restore_mode: RESTORE_DEFAULT_ON
+    icon: mdi:led-on
+    entity_category: config

@@ -1,0 +1,10 @@
+substitutions:
+  friendly_name: REPLACEME
+
+# ---
+
+text_sensor:
+  - platform: libretiny
+    version:
+      name: LibreTiny Version
+      icon: mdi:cellphone-arrow-down

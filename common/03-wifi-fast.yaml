@@ -1,0 +1,16 @@
+substitutions:
+  static_ip: REPLACEME
+  gateway: 192.168.0.1
+  subnet: 255.255.255.0
+
+# ---
+
+wifi:
+  networks:
+    - ssid: !secret wifi_ssid
+      password: !secret wifi_psk
+  fast_connect: true
+  manual_ip:
+    static_ip: ${static_ip}
+    gateway: ${gateway}
+    subnet: ${subnet}

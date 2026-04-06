@@ -1,0 +1,60 @@
+substitutions:
+  cf_pin: REPLACEME
+  cf1_pin: REPLACEME
+  sel_pin: REPLACEME
+  cf_cf1_inverted: true
+  voltage_divider: "800"
+  current_resistor: "0.001 ohm"
+
+# ---
+
+sensor:
+  - platform: hlw8012
+    model: BL0937
+    cf_pin:
+      number: ${cf_pin}
+      inverted: ${cf_cf1_inverted}
+    cf1_pin:
+      number: ${cf1_pin}
+      inverted: ${cf_cf1_inverted}
+    sel_pin:
+      number: ${sel_pin}
+      inverted: true
+    voltage_divider: ${voltage_divider}
+    current_resistor: ${current_resistor}
+    initial_mode: VOLTAGE
+    update_interval: 5s
+    change_mode_every: 2
+    voltage:
+      name: Voltage
+      id: voltage
+      icon: mdi:sine-wave
+    power:
+      name: Power
+      id: power
+      icon: mdi:current-ac
+      on_value:
+        - component.update: current
+    current:
+      name: Sensor Current
+    energy:
+      name: Sensor Energy
+
+  - platform: total_daily_energy
+    name: Daily Energy
+    icon: mdi:home-lightning-bolt-outline
+    power_id: power
+    unit_of_measurement: kWh
+    state_class: total_increasing
+    device_class: energy
+    accuracy_decimals: 3
+    filters:
+      - multiply: 0.001
+
+  - platform: template
+    id: current
+    name: Calculated Current
+    lambda: !lambda 'return id(power).state / id(voltage).state;'
+    unit_of_measurement: A
+    accuracy_decimals: 3
+    update_interval: never

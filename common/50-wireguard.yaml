@@ -1,0 +1,35 @@
+substitutions:
+  wg_address: REPLACEME
+  wg_private_key: REPLACEME
+  wg_preshared_key: REPLACEME
+
+# ---
+
+wireguard:
+  address: ${wg_address}
+  netmask: 255.255.255.0
+  private_key: ${wg_private_key}
+
+  peer_public_key: !secret wg_peer_public_key
+  peer_preshared_key: ${wg_preshared_key}
+  peer_endpoint: !secret wg_peer_endpoint
+  peer_port: !secret wg_peer_port
+  peer_persistent_keepalive: 25s
+
+binary_sensor:
+  - platform: wireguard
+    status:
+      name: WireGuard Status
+      icon: mdi:vpn
+
+sensor:
+  - platform: wireguard
+    latest_handshake:
+      name: WireGuard Latest Handshake
+      icon: mdi:handshake
+
+text_sensor:
+  - platform: wireguard
+    address:
+      name: WireGuard Address
+      icon: mdi:ip-network

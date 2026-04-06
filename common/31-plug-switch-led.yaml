@@ -1,0 +1,37 @@
+substitutions:
+  button_pin: REPLACEME
+  button_inverted: true
+  relay_pin: REPLACEME
+  led_pin: REPLACEME
+  led_inverted: true
+
+# ---
+
+binary_sensor:
+  - platform: gpio
+    id: binary_switch_1
+    pin:
+      number: ${button_pin}
+      inverted: ${button_inverted}
+      mode: INPUT_PULLUP
+    on_press:
+      then:
+        - switch.toggle: switch_1
+
+switch:
+  - platform: gpio
+    id: switch_1
+    name: Switch
+    pin: ${relay_pin}
+    icon: mdi:power-plug-outline
+    on_turn_on:
+      - light.turn_on: light_switch
+    on_turn_off:
+      - light.turn_off: light_switch
+
+light:
+  - platform: status_led
+    id: light_switch
+    pin:
+      number: ${led_pin}
+      inverted: ${led_inverted}

@@ -1,0 +1,83 @@
+substitutions:
+  device_name: REPLACEME
+  friendly_name: REPLACEME
+  api_key: ""
+  ota_password: ""
+
+# ---
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+
+logger:
+
+wifi:
+  ap:
+  reboot_timeout: 10min
+
+api:
+  reboot_timeout: 0s
+  encryption:
+    key: ${api_key}
+
+ota:
+  - platform: esphome
+    password: ${ota_password}
+
+web_server:
+  version: 3
+
+captive_portal:
+
+mdns:
+
+# ---
+
+button:
+  - platform: restart
+    name: Restart
+    icon: mdi:restart
+    entity_category: diagnostic
+  - platform: factory_reset
+    name: Factory Reset
+    icon: mdi:restart-alert
+    entity_category: diagnostic
+  - platform: template
+    name: Save Preferences
+    icon: mdi:content-save
+    entity_category: diagnostic
+    on_press:
+      - lambda: global_preferences->sync();
+
+debug:
+  update_interval: 30s
+
+text_sensor:
+  - platform: debug
+    reset_reason:
+      name: Reset Reason
+      icon: mdi:restart
+  - platform: wifi_info
+    ip_address:
+      name: IP Address
+      icon: mdi:ip-network
+
+sensor:
+  - platform: uptime
+    name: Uptime
+    icon: mdi:timer-outline
+    update_interval: 30s
+  - platform: wifi_signal
+    name: Wi-Fi Signal
+    icon: mdi:wifi
+    update_interval: 60s
+  - platform: debug
+    free:
+      name: Free Heap
+      icon: mdi:memory
+
+time:
+  - platform: sntp
+    id: time_sntp
+    timezone: Europe/Warsaw

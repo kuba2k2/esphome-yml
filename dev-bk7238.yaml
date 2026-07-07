@@ -12,13 +12,9 @@ substitutions:
 
 bk72xx:
   board: generic-bk7238
-  family: BK7231N
+  family: BK7238
   framework:
     version: latest
     uart_port: 1
-
-esphome:
-  platformio_options:
-    custom_versions.beken-bdk: 3.0.78
 
 # ---

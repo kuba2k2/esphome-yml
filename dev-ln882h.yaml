@@ -1,0 +1,19 @@
+packages:
+  base: !include common/00-base.yaml
+  lt-version: !include common/02-lt-version.yaml
+  wifi-fast: !include common/03-wifi-fast.yaml
+substitutions:
+  device_name: dev-ln882h
+  friendly_name: Dev LN882H
+  api_key: !secret dev_api
+  static_ip: 192.168.0.99
+
+# ---
+
+ln882x:
+  board: wl2s
+  family: LN882H
+  framework:
+    version: latest
+
+# ---

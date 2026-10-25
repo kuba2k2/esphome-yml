@@ -1,0 +1,124 @@
+packages:
+  base: !include common/00-base.yaml
+substitutions:
+  device_name: cyd
+  friendly_name: CYD
+  api_key: !secret cyd_api
+
+# ---
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+spi:
+  - id: spi_tft
+    clk_pin: 14
+    mosi_pin: 13
+    miso_pin: 12
+  - id: spi_touchscreen
+    clk_pin: 25
+    mosi_pin: 32
+    miso_pin: 39
+
+display:
+  - platform: ili9xxx
+    spi_id: spi_tft
+    cs_pin: 15
+    dc_pin: 2
+    model: ILI9341
+    dimensions: 320x240
+    invert_colors: false
+    color_palette: 8BIT
+    color_order: RGB
+    update_interval: never
+    auto_clear_enabled: false
+    show_test_card: false
+    transform:
+      mirror_y: true
+
+touchscreen:
+  - platform: xpt2046
+    spi_id: spi_touchscreen
+    cs_pin: 33
+    interrupt_pin: 36
+    calibration:
+      x_min: 360
+      x_max: 3800
+      y_min: 200
+      y_max: 3800
+    transform:
+      swap_xy: true
+    on_release:
+      - light.control:
+          id: light_backlight
+          brightness: 100%
+      - if:
+          condition: lvgl.is_paused
+          then:
+            - lvgl.resume:
+            - lvgl.widget.redraw:
+            - light.turn_on: light_backlight
+
+lvgl:
+  buffer_size: 25%
+  on_idle:
+    - timeout: 30s
+      then:
+        - light.control:
+            id: light_backlight
+            brightness: 50%
+    - timeout: 120s
+      then:
+        - light.turn_off: light_backlight
+        - lvgl.pause:
+
+output:
+  - platform: ledc
+    id: output_backlight
+    pin: 21
+  - platform: ledc
+    id: output_led_r
+    pin: 4
+    inverted: true
+  - platform: ledc
+    id: output_led_g
+    pin: 16
+    inverted: true
+  - platform: ledc
+    id: output_led_b
+    pin: 17
+    inverted: true
+
+# ---
+
+light:
+  - platform: monochromatic
+    id: light_backlight
+    name: "Backlight"
+    output: output_backlight
+    restore_mode: ALWAYS_ON
+  - platform: rgb
+    id: light_led_rgb
+    name: "RGB LED"
+    red: output_led_r
+    green: output_led_g
+    blue: output_led_b
+
+binary_sensor:
+  - platform: gpio
+    id: button_boot
+    name: "Boot Button"
+    pin:
+      number: 0
+      inverted: true
+
+sensor:
+  - platform: adc
+    id: sensor_light
+    name: "Light Sensor"
+    pin: 34
+    update_interval: 2s
+
+# ---

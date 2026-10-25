@@ -31,4 +31,8 @@ bk72xx:
   framework:
     uart_port: 1
 
+esphome:
+  platformio_options:
+    custom_versions.beken-bdk: 3.0.78
+
 # ---
